@@ -1,17 +1,27 @@
 "use strict";
+// when it uses "interface"
 Object.defineProperty(exports, "__esModule", { value: true });
-const sayHi = (name, age, gender) => {
-    console.log(`Hi! I'm ${name}! I'm ${age} years old. You are a ${gender}?????`);
+const student1 = {
+    name: "nicolas",
+    age: 22,
 };
-const Hello = (name, age, gender) => {
-    console.log(`Hi! I'm ${name}! I'm ${age} years old. You are a ${gender}`);
+const sayHi = (student1) => {
+    return `Hello, I'm ${student1.name}! I'm ${student1.age} years old!`;
 };
-const add = (num1, num2) => {
-    console.log(num1 + num2);
-    return num1 + num2;
+console.log(sayHi(student1));
+// when it uses "class"
+class Subject {
+    //private grade: number;
+    // if "private" keyword is used, it means that can be used only "Subject" prototype.
+    constructor(name, grade) {
+        this.name = name;
+        this.grade = grade;
+    }
+}
+const favoriteSub = new Subject("Math", "A+");
+const introduce = (favoriteSub) => {
+    return `My favorite Subject is ${favoriteSub.name}! I always got an ${favoriteSub.grade} !!`;
 };
-add(2, 3);
-Hello("Wane", 25, "female");
-sayHi("Tate", 23, "male");
-// export를 하지 않으면 변수를 선언할 수 없다는 에러가 출력됨
+console.log(introduce(favoriteSub));
+// Typescript needs "export" keyword. when it was not here, Typescript won't work
 //# sourceMappingURL=index.js.map
