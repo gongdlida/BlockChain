@@ -1,41 +1,93 @@
-// when it uses "interface"
+import * as CryptoJs from "crypto-js"
 
-interface Student {
-  name: string;
-  age: number;
-}
+class Block {
+  
+  static calculateBlockHash = (
+     index:number, 
+     previousHash: string, 
+     timestamp: number, 
+     data: string):string => 
+     CryptoJs.SHA256(index + previousHash + timestamp + data).toString();
+  
+  static validateStructure = (aBlock:Block) :boolean=> typeof aBlock.index === "number" && typeof aBlock.hash === "string" && typeof aBlock.previousHash === "string" && typeof aBlock.data ==="string"
+    
+  public index:number
+  public hash : string
+  public previousHash: string
+  public data : string
+  public timestamp: number
+   constructor( 
+    index : number,
+    hash : string,
+    previousHash : string,
+    data: string, 
+    timestamp: number
+    
+  ){
+    this.index = index,
+    this.hash = hash,
+    this.previousHash = previousHash,
+    this.data= data, 
+    this.timestamp= timestamp
 
-const student1 = {
-  name: "nicolas",
-  age: 22,
-};
-
-const sayHi = (student1: Student): string => {
-  return `Hello, I'm ${student1.name}! I'm ${student1.age} years old!`;
-};
-
-console.log(sayHi(student1));
-
-// when it uses "class"
-
-class Subject {
-  public name: string;
-  public grade: string;
-  //private grade: number;
-  // if "private" keyword is used, it means that can be used only "Subject" prototype.
-  constructor(name: string, grade: string) {
-    this.name = name;
-    this.grade = grade;
   }
 }
 
-const favoriteSub = new Subject("Math", "A+");
 
-const introduce = (favoriteSub: Subject): string => {
-  return `My favorite Subject is ${favoriteSub.name}! I always got an ${favoriteSub.grade} !!`;
-};
+const genesisBlock : Block = new Block(0,"2012", "" , "Hi",234)
 
-console.log(introduce(favoriteSub));
+let blockChain : Block[] = [genesisBlock];
 
+const getBlockChain = () : Block[] => blockChain;
+const getLatestBlock = (): Block => blockChain[blockChain.length-1];
+const getNewTimestamp = () : number => Math.round(new Date().getTime() / 1000);
+const createNewBlock = (data:string) : Block => {
+  const previousBlock:Block = getLatestBlock();
+  const newIndex: number = previousBlock.index + 1;
+  const newTimestamp: number = getNewTimestamp();
+  const newHash : string = Block.calculateBlockHash(newIndex,previousBlock.hash,newTimestamp,data)
+
+  const newBlock: Block = new Block(
+    newIndex,
+    newHash,
+    previousBlock.hash,
+    data,
+    newTimestamp
+  );
+addBlock(newBlock)
+  return newBlock;
+
+}
+
+const getHashforBlock= (aBlock : Block) : string => Block.calculateBlockHash(aBlock.index, aBlock.previousHash, aBlock.timestamp, aBlock.data)
+
+
+const isBlockValid = (candidateBlcok : Block, previousBlock: Block) : boolean=>{
+ if (!Block.validateStructure(candidateBlcok)) {
+   return false
+ } else if (previousBlock.index + 1 !== candidateBlcok.index){
+   return false
+ }else if (previousBlock.hash !== candidateBlcok.previousHash){
+   return false
+ } else if (getHashforBlock(candidateBlcok) !== candidateBlcok.hash){
+   return false
+ } else {
+   return true
+ }
+}
+
+
+const addBlock = (candidateBlcok : Block):void =>{
+  if(isBlockValid(candidateBlcok, getLatestBlock())){
+    blockChain.push(candidateBlcok)
+  }
+}
+
+createNewBlock("first")
+createNewBlock("second")
+createNewBlock("third")
+console.log(blockChain)
 export {};
+
 // Typescript needs "export" keyword. when it was not here, Typescript won't work
+  
